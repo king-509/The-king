@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsletter Admin</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
+    body { display:flex; background:#f4f6f9; min-height:100vh;}
+    a { text-decoration:none; color:inherit; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background:#007bff;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      padding:20px 0;
+    }
+    .sidebar h2 { text-align:center; margin-bottom:30px;}
+    .sidebar a { padding:15px 20px; display:block; color:white; transition:0.3s;}
+    .sidebar a:hover { background:rgba(255,255,255,0.2); }
+
+    /* Main content */
+    .main-content { flex:1; padding:20px; }
+    h1 { margin-bottom:20px; color:#333;}
+    table { width:100%; border-collapse:collapse; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+    th, td { padding:12px; text-align:left; border-bottom:1px solid #ddd;}
+    th { background:#007bff; color:white;}
+    tr:hover { background:#f1f1f1;}
+    .btn { padding:6px 12px; border:none; border-radius:6px; cursor:pointer; margin-right:5px; }
+    .btn.reply { background:#28a745; color:white; }
+    .btn.delete { background:#dc3545; color:white; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="contacts.html">Contacts</a>
+    <a href="messages.html">Messages</a>
+    <a href="newsletter.html">Newsletter</a>
+    <a href="statistiques.html">Statistiques</a>
+    <a href="#">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <h1>Abonnés Newsletter</h1>
+
+    <table id="newsletterTable">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Jean Dupont</td>
+          <td>jean@example.com</td>
+          <td>
+            <button class="btn reply" onclick="replyEmail(this)">Répondre</button>
+            <button class="btn delete" onclick="deleteSubscriber(this)">Supprimer</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Marie Toussaint</td>
+          <td>marie@example.com</td>
+          <td>
+            <button class="btn reply" onclick="replyEmail(this)">Répondre</button>
+            <button class="btn delete" onclick="deleteSubscriber(this)">Supprimer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Supprimer un abonné
+    function deleteSubscriber(btn) {
+      if(confirm("Supprimer cet abonné ?")) {
+        const row = btn.closest('tr');
+        row.remove();
+      }
+    }
+
+    // Répondre avec texte automatique via Gmail
+    function replyEmail(btn) {
+      const row = btn.closest('tr');
+      const email = row.cells[1].textContent;
+      const subject = encodeURIComponent("Merci pour votre inscription à notre newsletter");
+      const body = encodeURIComponent("Bonjour,\n\nMerci de vous être inscrit à notre newsletter. Nous vous tiendrons informé de nos dernières actualités.\n\nCordialement,\nL'équipe Admin");
+      window.open(`https://mail.google.com/mail/?view=cm&to=${email}&su=${subject}&body=${body}`, '_blank');
+    }
+  </script>
+
+</body>
+</html>
