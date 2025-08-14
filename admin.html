@@ -1,625 +1,188 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Admin Panel — Local (Contacts / Newsletter / Messages)</title>
-<style>
-  :root{
-    --bg:#f5f7fb; --accent:#2467a8; --muted:#6b7280; --card:#fff;
-    --danger:#e53e3e; --success:#16a34a;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:var(--bg);color:#111}
-  /* Layout */
-  .app{display:flex;min-height:100vh}
-  .sidebar{width:220px;background:#0f1724;color:white;padding:24px 12px;position:fixed;left:0;top:0;bottom:0}
-  .sidebar h2{font-size:18px;margin:8px 0 18px;text-align:center}
-  .nav{display:flex;flex-direction:column;gap:6px}
-  .nav button{background:transparent;border:0;color:#cbd5e1;padding:10px 12px;text-align:left;border-radius:8px;cursor:pointer}
-  .nav button.active, .nav button:hover{background:#0b1220;color:white}
-  .main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
-  header{height:64px;background:white;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #e6eef8;position:sticky;top:0;z-index:50}
-  header h1{font-size:18px;margin:0}
-  .header-right{display:flex;align-items:center;gap:12px}
-  .dots{font-size:22px;cursor:pointer;padding:6px;border-radius:6px}
-  .dots:hover{background:#f2f6fb}
-  .dots-menu{position:absolute;right:20px;top:70px;background:white;border:1px solid #e6eef8;border-radius:8px;padding:8px;box-shadow:0 6px 20px rgba(25,50,80,0.08);display:none}
-  .dots-menu.open{display:block}
-  .container{padding:20px;flex:1}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:18px}
-  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.04)}
-  .controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-  input[type="text"], input[type="email"], input[type="tel"], textarea, select{padding:10px;border:1px solid #e6eef8;border-radius:8px;min-width:180px}
-  button{background:var(--accent);color:white;border:0;padding:10px 12px;border-radius:8px;cursor:pointer}
-  button.ghost{background:transparent;color:var(--accent);border:1px solid #dbeafe}
-  button.danger{background:var(--danger)}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:10px;border-bottom:1px solid #f1f5f9;text-align:left}
-  td.actions{display:flex;gap:8px}
-  .small{font-size:13px;color:var(--muted)}
-  .top-actions{display:flex;gap:8px;align-items:center}
-  .badge{background:#eef2ff;color:var(--accent);padding:6px 8px;border-radius:999px;font-weight:600}
-  .muted{color:var(--muted)}
-  .center{display:flex;align-items:center;justify-content:center}
-  .logo{display:flex;gap:8px;align-items:center}
-  .logo img{width:34px;height:34px;border-radius:6px;object-fit:cover}
-  /* responsive */
-  @media(max-width:900px){
-    .sidebar{display:none}
-    .main{margin-left:0}
-    header{left:0}
-  }
-  /* small helpers */
-  .pill{padding:6px 8px;border-radius:999px;background:#f1f5f9;color:#0b1220;font-weight:600}
-  .unread{background:#fff7ed}
-  .link-btn{background:transparent;border:0;color:var(--accent);cursor:pointer}
-  .input-inline{display:flex;gap:8px;align-items:center}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    /* Reset & global */
+    * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
+    body { display:flex; background:#f4f6f9; min-height:100vh;}
+    a { text-decoration:none; color:inherit; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background:#007bff;
+      color:white;
+      display:flex;
+      flex-direction:column;
+      padding:20px 0;
+    }
+    .sidebar h2 { text-align:center; margin-bottom:30px;}
+    .sidebar a { padding:15px 20px; display:block; color:white; transition:0.3s;}
+    .sidebar a:hover { background:rgba(255,255,255,0.2); }
+
+    /* Main content */
+    .main-content { flex:1; padding:20px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .topbar h1 { font-size:24px; color:#333;}
+    .topbar .profile { display:flex; align-items:center; gap:10px;}
+    .topbar .profile img { width:40px; border-radius:50%; }
+
+    /* Cards stats */
+    .cards { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px; }
+    .card { flex:1; min-width:180px; background:white; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+    .card h3 { font-size:18px; color:#555; margin-bottom:10px; }
+    .card p { font-size:22px; font-weight:bold; color:#007bff; }
+
+    /* Table */
+    table { width:100%; border-collapse:collapse; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+    th, td { padding:12px; text-align:left; border-bottom:1px solid #ddd;}
+    th { background:#007bff; color:white;}
+    tr:hover { background:#f1f1f1;}
+    .actions { cursor:pointer; }
+    .three-dots { font-weight:bold; cursor:pointer; }
+
+    /* Buttons */
+    .btn { padding:6px 12px; border:none; border-radius:6px; cursor:pointer;}
+    .btn.edit { background:#ffc107; color:white; }
+    .btn.delete { background:#dc3545; color:white; }
+    .btn.download { background:#28a745; color:white; margin-bottom:10px; }
+
+    /* Search */
+    .search-container { margin-bottom:10px; }
+    .search-container input { padding:8px; width:250px; border-radius:8px; border:1px solid #ccc; }
+
+  </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div style="display:flex;align-items:center;justify-content:center;flex-direction:column">
-      <div class="logo" style="margin-bottom:8px">
-        <img id="siteLogo" src="" alt="logo" />
-        <div style="text-align:left">
-          <div style="font-weight:700">Mon Admin</div>
-          <div class="small">Pannèl local</div>
-        </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Contacts</a>
+    <a href="#">Messages</a>
+    <a href="#">Newsletter</a>
+    <a href="#">Statistiques</a>
+    <a href="#">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="profile">
+        <span>Admin</span>
+        <img src="https://via.placeholder.com/40" alt="Profile">
       </div>
-      <input id="logoUrl" type="text" placeholder="URL du logo (coller ici)" style="width:90%;margin:6px 0;padding:8px;border-radius:6px;border:1px solid #e6eef8" />
-      <button style="width:90%;margin-bottom:8px" id="updateLogoBtn">Modifier le logo</button>
     </div>
 
-    <h2>Menu</h2>
-    <nav class="nav">
-      <button data-section="dashboard" class="active">Dashboard</button>
-      <button data-section="contacts">Contacts</button>
-      <button data-section="statistics">Statistiques</button>
-      <button data-section="newsletter">Newsletter</button>
-      <button data-section="messages">Messages</button>
-      <button data-section="logout" style="margin-top:10px;background:#07112a">Déconnexion</button>
-    </nav>
-    <div style="position:absolute;bottom:20px;left:12px;right:12px;color:#9aa4b2;font-size:13px">
-      © <span id="year"></span> Mon Admin
-    </div>
-  </aside>
-
-  <main class="main">
-    <header>
-      <h1>Admin Dashboard</h1>
-      <div class="header-right">
-        <div class="pill" id="visitsBadge">Visites: 0</div>
-        <div class="dots" id="dotsBtn">⋮</div>
-        <div class="dots-menu" id="dotsMenu">
-          <div style="padding:6px 8px;cursor:pointer" onclick="downloadAllVCF()">Télécharger tous les contacts (VCF)</div>
-          <div style="padding:6px 8px;cursor:pointer" onclick="exportNewsletterCSV()">Exporter Newsletter (.csv)</div>
-          <div style="padding:6px 8px;cursor:pointer" onclick="clearAllData()">Supprimer toutes les données (local)</div>
-        </div>
+    <!-- Stat cards -->
+    <div class="cards">
+      <div class="card">
+        <h3>Contacts Inscrits</h3>
+        <p id="contacts-count">0</p>
       </div>
-    </header>
-
-    <div class="container" id="appContainer">
-      <!-- Dashboard -->
-      <section id="dashboard" class="section">
-        <div class="grid">
-          <div class="card">
-            <h3>Résumé</h3>
-            <div style="display:flex;gap:8px;margin-top:12px">
-              <div style="flex:1">
-                <div class="small">Contacts (VCF)</div>
-                <div style="font-size:20px;font-weight:700" id="statContacts">0</div>
-              </div>
-              <div style="flex:1">
-                <div class="small">Newsletter</div>
-                <div style="font-size:20px;font-weight:700" id="statNewsletter">0</div>
-              </div>
-              <div style="flex:1">
-                <div class="small">Messages</div>
-                <div style="font-size:20px;font-weight:700" id="statMessages">0</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Actions rapides</h3>
-            <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-              <button onclick="goTo('contacts')">Gérer Contacts</button>
-              <button onclick="goTo('newsletter')" class="ghost">Gérer Newsletter</button>
-              <button onclick="goTo('messages')" class="ghost">Voir Messages</button>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Info</h3>
-            <p class="small">Ce panneau stocke tout en local (localStorage). Plus tard tu peux brancher ces actions sur ton API (Node + MongoDB).</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Dernières Activités</h3>
-          <div id="recentList" class="small" style="margin-top:10px">Aucune activité pour l'instant.</div>
-        </div>
-      </section>
-
-      <!-- Contacts -->
-      <section id="contacts" class="section" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h2>Contacts</h2>
-          <div class="top-actions">
-            <button onclick="downloadAllVCF()">Télécharger VCF</button>
-            <button onclick="removeAllContacts()" class="danger">Remove All</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="controls">
-            <input id="contactSearch" type="text" placeholder="Rechercher par nom ou numéro..." />
-            <button onclick="renderContacts()">Rechercher</button>
-            <div style="flex:1"></div>
-            <div class="input-inline">
-              <input id="newName" type="text" placeholder="Nom" />
-              <input id="newPhone" type="tel" placeholder="Téléphone (+509...)" />
-              <select id="newSource" title="Source">
-                <option value="vcf">VCF</option>
-                <option value="newsletter">Newsletter</option>
-                <option value="site">Site</option>
-              </select>
-              <button onclick="addContact()">Ajouter</button>
-            </div>
-          </div>
-
-          <table id="contactsTable">
-            <thead>
-              <tr><th>Nom</th><th>Numéro</th><th>Source</th><th>Actions</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Statistics -->
-      <section id="statistics" class="section" style="display:none">
-        <h2>Statistiques</h2>
-        <div class="grid" style="margin-top:12px">
-          <div class="card">
-            <h4>Contacts totaux</h4>
-            <div style="font-size:28px;font-weight:800" id="gTotal">0</div>
-            <div class="small">Quantité inscrits pour le fichier VCF</div>
-          </div>
-          <div class="card">
-            <h4>Newsletter</h4>
-            <div style="font-size:28px;font-weight:800" id="gNews">0</div>
-            <div class="small">Quantité inscrits pour rester informé</div>
-          </div>
-          <div class="card">
-            <h4>Visites</h4>
-            <div style="font-size:28px;font-weight:800" id="gVisits">0</div>
-            <div class="small">Quantité visite</div>
-          </div>
-          <div class="card">
-            <h4>Messages reçus</h4>
-            <div style="font-size:28px;font-weight:800" id="gMsgs">0</div>
-            <div class="small">Messages utilisateur</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Newsletter -->
-      <section id="newsletter" class="section" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h2>Newsletter - Reste informé</h2>
-          <div>
-            <button onclick="exportNewsletterCSV()">Exporter CSV</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="controls">
-            <input id="newsletterEmail" type="email" placeholder="Adresse e-mail" />
-            <button onclick="addNewsletter()">Ajouter</button>
-            <div style="flex:1"></div>
-          </div>
-
-          <table id="newsletterTable">
-            <thead><tr><th>Email</th><th>Actions</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Messages -->
-      <section id="messages" class="section" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <h2>Messages reçus</h2>
-          <div>
-            <button onclick="clearMessages()" class="ghost">Supprimer tous</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-bottom:12px">
-          <h3>Formulaire public (simulé)</h3>
-          <div class="controls">
-            <input id="pubName" type="text" placeholder="Nom" />
-            <input id="pubEmail" type="email" placeholder="E-mail" />
-            <input id="pubSubject" type="text" placeholder="Sujet" />
-            <textarea id="pubMessage" placeholder="Message" style="min-width:320px;min-height:70px;border-radius:8px"></textarea>
-            <button onclick="submitPublicMessage()">Envoyer</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <table id="messagesTable">
-            <thead><tr><th>Nom</th><th>Email</th><th>Sujet</th><th>Statut</th><th>Actions</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </section>
-
+      <div class="card">
+        <h3>Newsletter</h3>
+        <p id="newsletter-count">0</p>
+      </div>
+      <div class="card">
+        <h3>Messages Non Lus</h3>
+        <p id="messages-count">0</p>
+      </div>
     </div>
-  </main>
-</div>
 
-<script>
-  /* ========== App State (localStorage) ========== */
-  const LS_KEYS = { contacts: 'admin_contacts_v1', newsletter: 'admin_news_v1', messages: 'admin_msgs_v1', visits: 'admin_visits_v1', recent:'admin_recent_v1', logo:'admin_logo_v1' };
+    <!-- Contacts Table -->
+    <h2>Contacts</h2>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Rechercher par nom ou numéro">
+      <button class="btn download" onclick="downloadVCF()">Télécharger VCF</button>
+      <button class="btn delete" onclick="removeAll()">Supprimer Tout</button>
+    </div>
+    <table id="contactsTable">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Numéro</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Exemples -->
+        <tr>
+          <td>Jean Dupont</td>
+          <td>+509 1234 5678</td>
+          <td>
+            <span class="three-dots" onclick="toggleActions(this)">⋮</span>
+            <div class="actions-menu" style="display:none;">
+              <button class="btn edit">Modifier</button>
+              <button class="btn delete">Supprimer</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>Marie Toussaint</td>
+          <td>+509 8765 4321</td>
+          <td>
+            <span class="three-dots" onclick="toggleActions(this)">⋮</span>
+            <div class="actions-menu" style="display:none;">
+              <button class="btn edit">Modifier</button>
+              <button class="btn delete">Supprimer</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  function load(key, fallback = []) {
-    try { return JSON.parse(localStorage.getItem(key)) || fallback } catch(e){ return fallback }
-  }
-  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)) }
-
-  // initialize
-  let contacts = load(LS_KEYS.contacts, []);
-  let newsletter = load(LS_KEYS.newsletter, []);
-  let messages = load(LS_KEYS.messages, []);
-  let visits = parseInt(localStorage.getItem(LS_KEYS.visits) || '0', 10) || 0;
-  let recent = load(LS_KEYS.recent, []);
-  let logoUrl = localStorage.getItem(LS_KEYS.logo) || '';
-
-  // visits increment on load
-  visits += 1;
-  localStorage.setItem(LS_KEYS.visits, visits);
-  document.getElementById('visitsBadge').textContent = 'Visites: ' + visits;
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  // logo
-  const siteLogo = document.getElementById('siteLogo');
-  const logoInput = document.getElementById('logoUrl');
-  document.getElementById('updateLogoBtn').addEventListener('click', () => {
-    const url = logoInput.value.trim();
-    if(!url) return alert('Colle une URL d\'image.');
-    localStorage.setItem(LS_KEYS.logo, url);
-    loadLogo();
-  });
-  function loadLogo(){
-    const u = localStorage.getItem(LS_KEYS.logo) || '';
-    siteLogo.src = u || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="100%" height="100%" fill="%232467a8"/><text x="50%" y="55%" fill="%23fff" font-size="20" font-family="Arial" text-anchor="middle">AD</text></svg>';
-    logoInput.value = u;
-  }
-  loadLogo();
-
-  /* ========== Navigation / header dots ========== */
-  const navButtons = document.querySelectorAll('.nav button[data-section]');
-  navButtons.forEach(btn => btn.addEventListener('click', (e) => {
-    const s = btn.getAttribute('data-section');
-    if(s === 'logout'){ localStorage.removeItem('token'); alert('Déconnecté (local)'); return; }
-    goTo(s);
-    navButtons.forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-  }));
-
-  function goTo(section){
-    document.querySelectorAll('.section').forEach(sec => sec.style.display = sec.id === section ? '' : 'none');
-    window.scrollTo(0,0);
-    // refresh data after navigation
-    if(section === 'contacts') renderContacts();
-    if(section === 'statistics') renderStatistics();
-    if(section === 'newsletter') renderNewsletter();
-    if(section === 'messages') renderMessages();
-  }
-
-  // dots menu
-  const dotsBtn = document.getElementById('dotsBtn');
-  const dotsMenu = document.getElementById('dotsMenu');
-  dotsBtn.addEventListener('click', ()=>dotsMenu.classList.toggle('open'));
-  document.addEventListener('click', (e)=>{ if(!dotsMenu.contains(e.target) && e.target !== dotsBtn) dotsMenu.classList.remove('open') });
-
-  /* ========== Contacts ========== */
-  function addContact(){
-    const name = document.getElementById('newName').value.trim();
-    const phone = document.getElementById('newPhone').value.trim();
-    const source = document.getElementById('newSource').value;
-    if(!name || !phone) return alert('Remplis le nom et le téléphone.');
-    const c = { id: cryptoId(), name, phone, source, createdAt: Date.now() };
-    contacts.unshift(c);
-    save(LS_KEYS.contacts, contacts);
-    pushRecent(`Contact ajouté: ${name}`);
-    document.getElementById('newName').value=''; document.getElementById('newPhone').value='';
-    renderContacts();
-    renderStatistics();
-  }
-
-  function renderContacts(){
-    const tbody = document.querySelector('#contactsTable tbody');
-    tbody.innerHTML = '';
-    const q = document.getElementById('contactSearch').value.trim().toLowerCase();
-    const filtered = contacts.filter(c => (!q) || c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q));
-    if(filtered.length === 0){ tbody.innerHTML = '<tr><td colspan="4" class="muted center">Aucun contact</td></tr>'; return; }
-    for(const c of filtered){
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${escapeHtml(c.name)}</td>
-                      <td>${escapeHtml(c.phone)}</td>
-                      <td><span class="small">${c.source||'site'}</span></td>
-                      <td class="actions">
-                        <button title="modifier" onclick='editContact("${c.id}")'>✏</button>
-                        <button title="supprimer" onclick='deleteContact("${c.id}")'>🗑</button>
-                        <button title="télécharger vcf (contact)" onclick='downloadSingleVCF("${c.id}")' class="link-btn">VCF</button>
-                      </td>`;
-      tbody.appendChild(tr);
+  <script>
+    // Toggle 3 points menu
+    function toggleActions(el) {
+      const menu = el.nextElementSibling;
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
     }
-  }
 
-  function editContact(id){
-    const c = contacts.find(x=>x.id===id);
-    if(!c) return alert('Non trouvé');
-    const name = prompt('Nom', c.name);
-    const phone = prompt('Téléphone', c.phone);
-    if(name && phone){ c.name = name.trim(); c.phone = phone.trim(); save(LS_KEYS.contacts, contacts); pushRecent(`Contact modifié: ${c.name}`); renderContacts(); renderStatistics(); }
-  }
-
-  function deleteContact(id){
-    if(!confirm('Supprimer ce contact ?')) return;
-    contacts = contacts.filter(c=>c.id!==id);
-    save(LS_KEYS.contacts, contacts);
-    pushRecent('Contact supprimé');
-    renderContacts(); renderStatistics();
-  }
-
-  function removeAllContacts(){
-    if(!confirm('Supprimer tous les contacts ?')) return;
-    contacts = []; save(LS_KEYS.contacts, contacts);
-    pushRecent('Tous les contacts supprimés');
-    renderContacts(); renderStatistics();
-  }
-
-  function downloadSingleVCF(id){
-    const c = contacts.find(x=>x.id===id);
-    if(!c) return alert('Contact non trouvé');
-    const v = generateVCF([c]);
-    downloadBlob(v, 'contact.vcf', 'text/vcard');
-  }
-
-  function downloadAllVCF(){
-    if(contacts.length===0) return alert('Aucun contact à exporter');
-    const v = generateVCF(contacts);
-    downloadBlob(v, 'contacts.vcf', 'text/vcard');
-  }
-
-  function generateVCF(list){
-    let vcf = '';
-    list.forEach(c=>{
-      vcf += 'BEGIN:VCARD\\n';
-      vcf += 'VERSION:3.0\\n';
-      vcf += `FN:${sanitizeVCF(c.name)}\\n`;
-      vcf += `TEL;TYPE=CELL:${sanitizeVCF(c.phone)}\\n`;
-      vcf += 'END:VCARD\\n';
+    // Search contacts
+    document.getElementById("searchInput").addEventListener("keyup", function() {
+      let filter = this.value.toLowerCase();
+      let rows = document.querySelectorAll("#contactsTable tbody tr");
+      rows.forEach(row => {
+        let name = row.cells[0].textContent.toLowerCase();
+        let number = row.cells[1].textContent.toLowerCase();
+        row.style.display = (name.includes(filter) || number.includes(filter)) ? "" : "none";
+      });
     });
-    return vcf;
-  }
-  function sanitizeVCF(s){ return (s||'').replace(/\\n/g,' ') }
 
-  /* ========== Newsletter ========== */
-  function addNewsletter(){
-    const e = document.getElementById('newsletterEmail').value.trim();
-    if(!e) return alert('Entrer un e-mail');
-    if(newsletter.some(x=>x.email === e)) return alert('Déjà inscrit');
-    const item = { id: cryptoId(), email: e, createdAt: Date.now() };
-    newsletter.unshift(item);
-    save(LS_KEYS.newsletter, newsletter);
-    document.getElementById('newsletterEmail').value='';
-    pushRecent('Newsletter: ' + e);
-    renderNewsletter(); renderStatistics();
-  }
-
-  function renderNewsletter(){
-    const tbody = document.querySelector('#newsletterTable tbody');
-    tbody.innerHTML = '';
-    if(newsletter.length===0){ tbody.innerHTML = '<tr><td colspan="2" class="muted center">Aucun email</td></tr>'; return; }
-    for(const n of newsletter){
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${escapeHtml(n.email)}</td>
-                      <td><button onclick='deleteNewsletter("${n.id}")'>🗑</button></td>`;
-      tbody.appendChild(tr);
+    // Remove all
+    function removeAll() {
+      if(confirm("Supprimer tous les contacts ?")) {
+        document.querySelector("#contactsTable tbody").innerHTML = "";
+      }
     }
-  }
 
-  function deleteNewsletter(id){
-    newsletter = newsletter.filter(x=>x.id !== id);
-    save(LS_KEYS.newsletter, newsletter);
-    pushRecent('Email newsletter supprimé');
-    renderNewsletter(); renderStatistics();
-  }
-
-  function exportNewsletterCSV(){
-    if(newsletter.length===0) return alert('Aucun email');
-    const csv = 'email,createdAt\\n' + newsletter.map(n=>`${n.email},${new Date(n.createdAt).toISOString()}`).join('\\n');
-    downloadBlob(csv, 'newsletter.csv', 'text/csv');
-  }
-
-  /* ========== Messages ========== */
-  function submitPublicMessage(){
-    const name = document.getElementById('pubName').value.trim();
-    const email = document.getElementById('pubEmail').value.trim();
-    const subject = document.getElementById('pubSubject').value.trim();
-    const msg = document.getElementById('pubMessage').value.trim();
-    if(!name || !email || !msg) return alert('Remplis le formulaire');
-    const m = { id: cryptoId(), name, email, subject, message: msg, read:false, createdAt: Date.now() };
-    messages.unshift(m); save(LS_KEYS.messages, messages);
-    document.getElementById('pubName').value=''; document.getElementById('pubEmail').value=''; document.getElementById('pubSubject').value=''; document.getElementById('pubMessage').value='';
-    pushRecent('Nouveau message de ' + name);
-    renderMessages(); renderStatistics();
-    // Option: open mailto to admin to notify
-    if(confirm('Envoyer notification e-mail via votre client mail ?')) {
-      window.open(`mailto:?subject=${encodeURIComponent('Nouveau message: '+subject)}&body=${encodeURIComponent(name+' ('+email+')\\n\\n'+msg)}`);
+    // Download VCF (exemple simple)
+    function downloadVCF() {
+      let contacts = [];
+      document.querySelectorAll("#contactsTable tbody tr").forEach(row => {
+        let name = row.cells[0].textContent;
+        let phone = row.cells[1].textContent;
+        contacts.push(`BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEND:VCARD\n`);
+      });
+      if(contacts.length === 0) { alert("Aucun contact à télécharger"); return; }
+      let blob = new Blob(contacts, {type:"text/vcard"});
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "contacts.vcf";
+      a.click();
     }
-  }
 
-  function renderMessages(){
-    const tbody = document.querySelector('#messagesTable tbody');
-    tbody.innerHTML = '';
-    if(messages.length===0){ tbody.innerHTML = '<tr><td colspan="5" class="muted center">Aucun message</td></tr>'; return; }
-    for(const m of messages){
-      const tr = document.createElement('tr');
-      if(!m.read) tr.classList.add('unread');
-      tr.innerHTML = `<td>${escapeHtml(m.name)}</td>
-                      <td>${escapeHtml(m.email)}</td>
-                      <td>${escapeHtml(m.subject)}</td>
-                      <td>${m.read? 'Lue' : 'Non lue'}</td>
-                      <td class="actions">
-                        <button onclick='toggleRead("${m.id}")'>${m.read? 'Marquer non lue' : 'Marquer lue'}</button>
-                        <button onclick='replyMessage("${m.id}")'>Répondre</button>
-                        <button onclick='deleteMessage("${m.id}")'>🗑</button>
-                      </td>`;
-      tbody.appendChild(tr);
-    }
-  }
+    // Simuler counts
+    document.getElementById("contacts-count").textContent = document.querySelectorAll("#contactsTable tbody tr").length;
+    document.getElementById("newsletter-count").textContent = 12;
+    document.getElementById("messages-count").textContent = 5;
 
-  function toggleRead(id){
-    const m = messages.find(x=>x.id===id);
-    if(!m) return;
-    m.read = !m.read; save(LS_KEYS.messages, messages); renderMessages(); renderStatistics();
-  }
-
-  function replyMessage(id){
-    const m = messages.find(x=>x.id===id); if(!m) return;
-    // opens Gmail compose in new tab with to, subject, body
-    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(m.email)}&su=${encodeURIComponent('Re: '+(m.subject||''))}&body=${encodeURIComponent('\\n\\n---\\nOrig message:\\n'+m.message)}`;
-    window.open(url, '_blank');
-  }
-
-  function deleteMessage(id){
-    if(!confirm('Supprimer ce message ?')) return;
-    messages = messages.filter(x=>x.id!==id); save(LS_KEYS.messages, messages); pushRecent('Message supprimé'); renderMessages(); renderStatistics();
-  }
-
-  function clearMessages(){
-    if(!confirm('Supprimer tous les messages ?')) return;
-    messages = []; save(LS_KEYS.messages, messages); pushRecent('Tous les messages supprimés'); renderMessages(); renderStatistics();
-  }
-
-  /* ========== Stats & Recent ========== */
-  function renderStatistics(){
-    document.getElementById('statContacts').textContent = contacts.length;
-    document.getElementById('statNewsletter').textContent = newsletter.length;
-    document.getElementById('statMessages').textContent = messages.length;
-    document.getElementById('gTotal').textContent = contacts.length;
-    document.getElementById('gNews').textContent = newsletter.length;
-    document.getElementById('gVisits').textContent = visits;
-    document.getElementById('gMsgs').textContent = messages.length;
-    document.getElementById('visitsBadge').textContent = 'Visites: ' + visits;
-
-    // recent list
-    const rList = recent.slice(0,8);
-    const el = document.getElementById('recentList');
-    el.innerHTML = rList.length ? rList.map(x=>`<div>${escapeHtml(x)}</div>`).join('') : 'Aucune activité pour l\'instant.';
-  }
-
-  /* ========== Recent helper ========== */
-  function pushRecent(text){
-    recent.unshift(`${new Date().toLocaleString()}: ${text}`);
-    recent = recent.slice(0,40);
-    save(LS_KEYS.recent, recent);
-    renderStatistics();
-  }
-
-  /* ========== Utility ========== */
-  function cryptoId(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4) }
-  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; }) }
-
-  function downloadBlob(content, filename, mime){
-    const blob = new Blob([content], { type: mime || 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click();
-    a.remove(); URL.revokeObjectURL(url);
-  }
-
-  function clearAllData(){
-    if(!confirm('Supprimer toutes les données locales (contacts, newsletter, messages, recent) ?')) return;
-    contacts = []; newsletter = []; messages = []; recent = []; save(LS_KEYS.contacts, contacts); save(LS_KEYS.newsletter, newsletter); save(LS_KEYS.messages, messages); save(LS_KEYS.recent, recent);
-    pushRecent('Toutes les données supprimées');
-    renderAll();
-  }
-
-  function renderAll(){
-    renderContacts(); renderNewsletter(); renderMessages(); renderStatistics();
-  }
-
-  /* ========== Misc helpers for export / import ========== */
-  function downloadSampleData(){
-    const sample = {
-      contacts: [{id:cryptoId(), name:'Jean Pierre', phone:'+50912345678', source:'vcf', createdAt:Date.now()}],
-      newsletter: [{id:cryptoId(), email:'client@example.com', createdAt:Date.now()}],
-      messages: [{id:cryptoId(), name:'Visiteur', email:'visiteur@example.com', subject:'Question', message:'Bonjour', read:false, createdAt:Date.now()}]
-    };
-    save(LS_KEYS.contacts, sample.contacts);
-    save(LS_KEYS.newsletter, sample.newsletter);
-    save(LS_KEYS.messages, sample.messages);
-    contacts = sample.contacts; newsletter = sample.newsletter; messages = sample.messages;
-    pushRecent('Données d\'exemple importées');
-    renderAll();
-  }
-
-  /* ========== On load ========== */
-  function init(){
-    // load from storage to objects
-    contacts = load(LS_KEYS.contacts, contacts);
-    newsletter = load(LS_KEYS.newsletter, newsletter);
-    messages = load(LS_KEYS.messages, messages);
-    recent = load(LS_KEYS.recent, recent);
-    renderAll();
-    // add keyboard listener: ctrl+shift+s to import sample
-    document.addEventListener('keydown', (e)=>{ if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==='s'){ if(confirm('Importer données exemple ?')) downloadSampleData(); } });
-  }
-  init();
-
-  /* ========== Safety helpers ========== */
-  function escapeCSVCell(v){ if(v==null) return ''; return '"'+String(v).replace(/"/g,'""')+'"' }
-  function exportNewsletterCSV(){ // accessible global
-    if(newsletter.length===0) return alert('Aucun email');
-    const rows = ['email,createdAt', ...newsletter.map(n => `${escapeCSVCell(n.email)},${new Date(n.createdAt).toISOString()}`)];
-    downloadBlob(rows.join('\\n'),'newsletter.csv','text/csv');
-  }
-
-  /* ========== VCF specific (global) ========== */
-  function sanitizeForVCF(s){ return (s||'').replace(/[\\n\\r]+/g,' ').replace(/[:;]/g,' ') }
-
-  /* ========== Expose some functions for inline buttons ========== */
-  window.editContact = editContact;
-  window.deleteContact = deleteContact;
-  window.removeAllContacts = removeAllContacts;
-  window.downloadAllVCF = downloadAllVCF;
-  window.downloadSingleVCF = downloadSingleVCF;
-  window.exportNewsletterCSV = exportNewsletterCSV;
-  window.clearAllData = clearAllData;
-  window.goTo = (s) => { document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); const b = document.querySelector('.nav button[data-section=\"'+s+'\"]'); if(b) b.classList.add('active'); goTo(s); };
-
-  /* ========== Helpers for VCF correctness ========== */
-  function generateVCF(list){
-    let v='';
-    for(const c of list){
-      v += 'BEGIN:VCARD\\r\\n';
-      v += 'VERSION:3.0\\r\\n';
-      v += 'FN:' + sanitizeForVCF(c.name) + '\\r\\n';
-      v += 'TEL;TYPE=CELL:' + sanitizeForVCF(c.phone) + '\\r\\n';
-      v += 'END:VCARD\\r\\n';
-    }
-    return v;
-  }
-
-  /* ========== initial render ========= */
-  renderAll();
-
-</script>
+  </script>
 </body>
-                </html>
+</html>
