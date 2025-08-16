@@ -620,6 +620,14 @@ footer {
   </style>
 </head>
 <body>
+
+  <script>
+  document.addEventListener("keydown", function(e) {
+    if (e.ctrlKey && e.key === "l") {
+      window.location.href = "login.html";
+    }
+  });
+  </script>
   
   <div class="container">
     <h1>🎯 Bienvenue sur Ralph Xpert</h1>
@@ -1065,6 +1073,7 @@ footer {
       <a href="#">Politique de confidentialité</a>
     </div>
   </footer>
+
     
 </body>
 </html>
