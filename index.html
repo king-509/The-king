@@ -621,6 +621,24 @@ footer {
 </head>
 <body>
 
+  <!-- login.html -->
+<input type="text" id="username" placeholder="Nom d'utilisateur">
+<input type="password" id="password" placeholder="Mot de passe">
+<button onclick="login()">Se connecter</button>
+
+<script>
+  function login() {
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+
+    if (user === "eloge" && pass === "1234") {
+      window.location.href = "admin.html";
+    } else {
+      alert("Identifiants incorrects");
+    }
+  }
+</script>
+  
   <div class="container">
     <h1>🎯 Bienvenue sur Ralph Xpert</h1>
     <p>
